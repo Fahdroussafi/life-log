@@ -4,8 +4,8 @@ const cors = require("cors");
 require("dotenv").config();
 require("colors");
 const startServer = require("./config/database");
-const { errorHandler } = require("./middleware/errorMiddleware");
-const { notFound } = require("./middleware/notFound");
+const { errorHandler } = require("./middleware/error.middleware");
+const { notFound } = require("./middleware/route.middleware");
 
 const app = express();
 
@@ -19,6 +19,7 @@ app.use(cors());
 app.use(express.json());
 
 // routes
+app.use("/api/users", require("./authentication-service/auth.route"));
 
 app.get("/", (req, res) => {
   console.log("health check");
