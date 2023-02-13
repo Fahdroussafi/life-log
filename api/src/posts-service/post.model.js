@@ -5,7 +5,7 @@ const postSchema = new mongoose.Schema({
   title: { type: String },
   message: { type: String },
   name: { type: String },
-  creator: { type: Schema.Types.ObjectId, ref: "User" },
+  creator: { type: String },
   tags: { type: [String] },
   selectedFile: { type: String },
   likes: { type: [String], default: [] },
@@ -17,4 +17,4 @@ const postSchema = new mongoose.Schema({
 });
 
 postSchema.plugin(uniqueValidator);
-module.exports = mongoose.model("Admin", postSchema);
+module.exports = mongoose.model("Posts", postSchema);
