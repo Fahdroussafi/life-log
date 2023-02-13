@@ -19,7 +19,7 @@ app.use(cors());
 app.use(express.json());
 
 // routes
-app.use("/api/users", require("./authentication-service/auth.route"));
+app.use("/api/auth", require("./authentication-service/auth.route"));
 
 app.get("/", (req, res) => {
   console.log("health check");
