@@ -20,6 +20,7 @@ app.use(express.json());
 
 // routes
 app.use("/api/auth", require("./authentication-service/auth.route"));
+app.use("/api/posts", require("./posts-service/post.route"));
 
 app.get("/", (req, res) => {
   console.log("health check");
