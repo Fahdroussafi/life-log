@@ -5,73 +5,50 @@
  * @format
  */
 
-import React from 'react';
-import {View, StatusBar} from 'react-native';
-import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {useNavigation} from '@react-navigation/native';
+import React, {useEffect, useState} from 'react';
 
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import {QueryClient, QueryClientProvider} from 'react-query';
 
-import LandingScreen from './screens/LandingScreen';
-import LoginScreen from './screens/LoginScreen';
-import RegisterScreen from './screens/RegisterScreen';
-import HomeScreen from './screens/HomeScreen';
+// aysnc-storage
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Stack = createNativeStackNavigator();
+// credentials context
+import {CredentialsContext} from './components/CredentialsContext';
 
-const CustomHeader = () => {
-  const navigation = useNavigation();
+// RootStack
+import RootStack from './navigators/RootStack';
+
+const queryClient = new QueryClient();
+
+function Root() {
+  const [appReady, setAppReady] = useState(false);
+  const [storedCredentials, setStoredCredentials] = useState('');
+
+  const checkLoginCredentials = () => {
+    AsyncStorage.getItem('token')
+      .then(result => {
+        if (result !== null) {
+          setStoredCredentials(JSON.parse(result));
+        } else {
+          setStoredCredentials(null);
+        }
+      })
+      .catch(error => console.log(error));
+  };
+
+  useEffect(() => {
+    checkLoginCredentials();
+    setAppReady(true);
+  }, []);
 
   return (
-    <View className="p-3 mt-2">
-      <Icon
-        name="arrow-back"
-        size={24}
-        color="#000000"
-        onPress={() => navigation.goBack()}
-      />
-    </View>
-  );
-};
-
-function App() {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{headerShown: false}}>
-        <Stack.Screen name="Landing" component={LandingScreen} />
-        <Stack.Screen
-          name="Login"
-          component={LoginScreen}
-          options={{
-            headerShown: true,
-            header: () => <CustomHeader />,
-            animation: 'slide_from_bottom',
-          }}
-        />
-        <Stack.Screen
-          name="Register"
-          component={RegisterScreen}
-          options={{
-            headerShown: true,
-            header: () => <CustomHeader />,
-            animation: 'slide_from_bottom',
-          }}
-        />
-        <Stack.Screen
-          name="Home"
-          component={HomeScreen}
-          options={{
-            headerShown: true,
-            header: () => <CustomHeader />,
-            animation: 'slide_from_right',
-          }}
-        />
-      </Stack.Navigator>
-
-      <StatusBar barStyle="light-content" />
-    </NavigationContainer>
+    <CredentialsContext.Provider
+      value={{storedCredentials, setStoredCredentials}}>
+      <QueryClientProvider client={queryClient}>
+        {appReady && <RootStack />}
+      </QueryClientProvider>
+    </CredentialsContext.Provider>
   );
 }
 
-export default App;
+export default Root;
