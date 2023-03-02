@@ -55,12 +55,20 @@ const Register = asyncHandler(async (req, res) => {
 
   // Create user
   const user = await User.create({ name, email, password: hashedPassword });
+
+  const token = jwt.sign(
+    { email: email, id: user._id },
+    process.env.JWT_SECRET,
+    { expiresIn: "1h" }
+  );
+
   if (user) {
     res.status(201).json({
       _id: user._id,
       name: user.name,
       email: user.email,
       password: hashedPassword,
+      token: token,
     });
   } else {
     res.status(400);
