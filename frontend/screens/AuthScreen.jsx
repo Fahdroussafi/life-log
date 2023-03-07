@@ -29,7 +29,7 @@ import {CredentialsContext} from '../components/CredentialsContext';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function AuthScreen() {
+export default function AuthScreen({navigation}) {
   const {height, width} = Dimensions.get('window');
   const imagePosition = useSharedValue(1);
   const formButtonScale = useSharedValue(1);
@@ -47,18 +47,24 @@ export default function AuthScreen() {
     {
       onSuccess: data => {
         persistLogin(data);
-        // navigation.navigate('App', {screen: 'Home'});
+        navigation.navigate('Nav', {screen: 'Home'});
       },
       onError: error => {
         Alert.alert('Error', error.response.data.message);
       },
+      isLoading: setTimeout(() => {
+        return isLoading;
+      }, 5000),
     },
   );
 
   const persistLogin = async data => {
-    AsyncStorage.setItem('token', JSON.stringify(data.token))
+    AsyncStorage.setItem('token', JSON.stringify(data.token));
+    AsyncStorage.setItem('user', JSON.stringify(data.result.name))
       .then(() => {
         setStoredCredentials(data.token);
+        setStoredCredentials(data.result.name);
+        console.log(data.result.name);
       })
       .catch(error => {
         console.error(error);
@@ -126,12 +132,12 @@ export default function AuthScreen() {
   return (
     <Animated.View style={styles.container}>
       <Animated.View style={[StyleSheet.absoluteFill, imageAnimatedStyle]}>
-        <Svg height={height + 100} width={width}>
+        <Svg height={height + 70} width={width}>
           <ClipPath id="clipPathId">
-            <Ellipse cx={width / 2} rx={height} ry={height + 100} />
+            <Ellipse cx={width / 2} rx={height} ry={height + 90} />
           </ClipPath>
           <Image
-            href={require('../assets/travel.png')}
+            href={require('../assets/bg.jpg')}
             width={width + 100}
             height={height + 100}
             preserveAspectRatio="xMidYMid slice"
@@ -142,7 +148,7 @@ export default function AuthScreen() {
           style={[styles.closeButtonContainer, closeButtonContainerStyle]}>
           <Text
             onPress={() => (imagePosition.value = 1)}
-            className="text-black">
+            className="text-white">
             X
           </Text>
         </Animated.View>
@@ -166,6 +172,7 @@ export default function AuthScreen() {
             keyboardType="email-address"
             style={styles.textInput}
             onChangeText={text => setEmail(text)}
+            value={email}
           />
           {isRegistering && (
             <TextInput
@@ -173,6 +180,7 @@ export default function AuthScreen() {
               placeholderTextColor="white"
               style={styles.textInput}
               onChangeText={text => setName(text)}
+              value={name}
             />
           )}
           <TextInput
@@ -181,6 +189,7 @@ export default function AuthScreen() {
             secureTextEntry={true}
             style={styles.textInput}
             onChangeText={text => setPassword(text)}
+            value={password}
           />
           <Animated.View style={[styles.formButton, formButtonAnimatedStyle]}>
             <Pressable
@@ -198,11 +207,9 @@ export default function AuthScreen() {
             </Pressable>
           </Animated.View>
           {isLoading && (
-            <ActivityIndicator
-              size="large"
-              color="white"
-              style={{marginTop: 20}}
-            />
+            <View style={styles.activityIndicatorContainer}>
+              <ActivityIndicator size="large" color="white" />
+            </View>
           )}
         </Animated.View>
       </View>
