@@ -6,7 +6,7 @@ import {
   FlatList,
   TextInput,
   TouchableOpacity,
-  RefreshControl
+  RefreshControl,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import moment from 'moment';
@@ -23,8 +23,20 @@ const Posts = () => {
   const [data, setData] = useState([]);
   const [endReached, setEndReached] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
+  const [refreshing, setRefreshing] = useState(false);
 
   const flatListRef = useRef(null);
+
+  const onRefresh = useCallback(async () => {
+    try {
+      setRefreshing(true);
+      await handleSearch(searchQuery, 1);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [searchQuery]);
 
   const handleSearch = useCallback(async (searchText, page = 1) => {
     try {
@@ -36,6 +48,9 @@ const Posts = () => {
       setData(prevData => (page === 1 ? data : [...prevData, ...data]));
       setPageNumber(page);
       setEndReached(false);
+      if (flatListRef.current) {
+        flatListRef.current?.scrollToOffset({offset: 0, animated: true});
+      }
     } catch (error) {
       console.log(error);
     } finally {
@@ -44,11 +59,8 @@ const Posts = () => {
   }, []);
 
   const handleLoadMore = useCallback(() => {
-    if (pageNumber < totalPages) {
-      setPageNumber(pageNumber + 1);
-    } else {
-      setEndReached(true);
-    }
+    setEndReached(pageNumber >= totalPages);
+    setPageNumber(pageNumber + 1);
   }, [pageNumber, totalPages]);
 
   // console.log('currentPage', pageNumber);
@@ -102,11 +114,22 @@ const Posts = () => {
     );
   };
 
-  const renderEmpty = () => (
-    <View className="flex-1 bg-[#F6F6F6] items-center justify-center">
-      <Text className="text-black text-center">No posts found.</Text>
-    </View>
-  );
+  const renderEmpty = () => {
+    if (loading) {
+      return (
+        <View className="flex-1 bg-[#F6F6F6] items-center justify-center">
+          <ActivityIndicator size="large" color="#20B08E" />
+          <Text className="text-black text-center">Looking for posts...</Text>
+        </View>
+      );
+    }
+
+    return (
+      <View className="flex-1 bg-[#F6F6F6] items-center justify-center">
+        <Text className="text-black text-center">No posts found.</Text>
+      </View>
+    );
+  };
 
   useEffect(() => {
     if (searchQuery) {
@@ -127,7 +150,7 @@ const Posts = () => {
           setLoading(false);
         });
     }
-  }, [pageNumber, totalPages]);
+  }, [pageNumber]);
 
   return (
     <View className="flex-1 bg-[#F6F6F6]">
@@ -146,7 +169,7 @@ const Posts = () => {
           placeholder="Search posts"
           placeholderTextColor={'#000'}
           value={searchQuery}
-          onChangeText={text => setSearchQuery(text)}
+          onChangeText={setSearchQuery}
           style={{
             backgroundColor: '#fff',
             borderRadius: 20,
@@ -172,6 +195,14 @@ const Posts = () => {
         onEndReachedThreshold={0.5}
         ListFooterComponent={renderFooter}
         ListEmptyComponent={renderEmpty}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#20B08E']}
+            progressBackgroundColor="#F6F6F6"
+          />
+        }
       />
     </View>
   );
