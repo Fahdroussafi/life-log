@@ -6,9 +6,9 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import LandingScreen from '../screens/LandingScreen';
 
 import Auth from './AuthStack';
-import App from './HomeStack';
+// import AuthScreen from '../screens/AuthScreen';
 
-import HomeScreen from '../screens/HomeScreen';
+import Nav from '../components/Nav';
 
 import {CredentialsContext} from '../components/CredentialsContext';
 
@@ -21,11 +21,7 @@ function RootStack() {
         <NavigationContainer>
           <Stack.Navigator screenOptions={{headerShown: false}}>
             {storedCredentials ? (
-              <Stack.Screen
-                name="App"
-                component={App}
-                options={{animation: 'slide_from_right'}}
-              />
+              <Stack.Screen name="Nav" component={Nav} />
             ) : (
               <>
                 <Stack.Screen
@@ -36,13 +32,15 @@ function RootStack() {
                 <Stack.Screen
                   name="Auth"
                   component={Auth}
-                  options={{animation: 'slide_from_bottom'}}
+                  options={{
+                    animation: 'slide_from_bottom',
+                  }}
                 />
 
                 {!storedCredentials && (
                   <Stack.Screen
-                    name="Home"
-                    component={HomeScreen}
+                    name="Nav"
+                    component={Nav}
                     options={{animation: 'slide_from_right'}}
                   />
                 )}
