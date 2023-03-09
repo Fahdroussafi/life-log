@@ -5,7 +5,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'flex-end',
-    backgroundColor: '#242424',
+    backgroundColor: '#F6F6F6',
   },
   button: {
     backgroundColor: '#20B08E',
@@ -38,6 +38,7 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     color: 'white',
     textAlign: 'center',
+    backgroundColor: '#010101',
   },
   formButton: {
     backgroundColor: '#20B08E',
@@ -59,7 +60,8 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   formInputContainer: {
-    // marginBottom: 70,
+    // marginBottom: 20,
+    marginTop: 20,
     ...StyleSheet.absoluteFill,
     zIndex: -1,
     justifyContent: 'center',
@@ -77,10 +79,79 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.34,
     shadowRadius: 6.27,
     elevation: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#010101',
     alignItems: 'center',
     borderRadius: 20,
     top: -20,
+  },
+  activityIndicatorContainer: {
+    ...StyleSheet.absoluteFill,
+    zIndex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+
+  postContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    marginHorizontal: 8,
+    marginVertical: 4,
+    padding: 15,
+  },
+  postHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  postAuthor: {
+    fontWeight: 'bold',
+    fontSize: 14,
+    color: '#000',
+  },
+  postDate: {
+    color: '#888',
+    fontSize: 12,
+  },
+  postBody: {
+    marginBottom: 8,
+  },
+  postTitle: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginBottom: 4,
+    color: '#000',
+  },
+  postContent: {
+    color: '#888',
+    fontSize: 14,
+  },
+  postFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    borderTopWidth: 1,
+    borderTopColor: '#ddd',
+    paddingTop: 8,
+  },
+  postLikes: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  postLikesCount: {
+    marginLeft: 4,
+    fontSize: 14,
+    color: '#888',
+  },
+  postComments: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  postCommentsCount: {
+    marginLeft: 4,
+    fontSize: 14,
+    color: '#888',
   },
 });
 
