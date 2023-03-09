@@ -12,10 +12,7 @@ const CreatePost = asyncHandler(async (req, res) => {
 
   try {
     await newPost.save();
-    res.status(201).json({
-      newPost: newPost,
-      message: "Post created successfully",
-    });
+    res.status(201).json(newPost);
   } catch (error) {
     res.status(409).json({ message: error.message });
   }
@@ -25,14 +22,25 @@ const CreatePost = asyncHandler(async (req, res) => {
 // @desc Get all posts
 // @access Private
 const GetPosts = asyncHandler(async (req, res) => {
+  const { page } = req.query;
   try {
-    const posts = await Post.find();
-    res.status(200).json({
-      posts: posts,
-      message: "Posts fetched successfully",
+    const LIMIT = 5;
+    const startIndex = (Number(page) - 1) * LIMIT; // get the starting index of every page
+
+    const total = await Post.countDocuments({});
+    const posts = await Post.find()
+      .sort({ _id: -1 })
+      .limit(LIMIT)
+      .skip(startIndex);
+
+    res.json({
+      data: posts,
+      currentPage: Number(page),
+      numberOfPages: Math.ceil(total / LIMIT),
     });
+    // show 5 more posts when the user clicks on the button "Load more"
   } catch (error) {
-    res.status(404).json({ messasge: error.message });
+    res.status(404).json({ message: error.message });
   }
 });
 
@@ -102,10 +110,50 @@ const LikePost = asyncHandler(async (req, res) => {
   res.status(200).json(updatedPost);
 });
 
+// @route POST api/posts/:id/commentpost
+// @desc Comment on a post
+// @access Private
+const CommentPost = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { value } = req.body;
+
+  const post = await Post.findById(id);
+
+  post.comments.push(value);
+
+  const updatedPost = await Post.findByIdAndUpdate(id, post, {
+    new: true,
+  });
+
+  res.json(updatedPost);
+});
+
+// @route GET api/posts/search
+// @desc Search for posts
+// @access Private
+
+// search for posts by tags and title
+const getPostsBySearch = asyncHandler(async (req, res) => {
+  const { searchQuery, tags } = req.query;
+  try {
+    const title = new RegExp(searchQuery, "i");
+
+    const posts = await Post.find({
+      $or: [{ title }, { tags: { $in: tags.split(",") } }],
+    });
+
+    res.json({ data: posts });
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+});
+
 module.exports = {
   CreatePost,
   GetPosts,
   UpdatePost,
   DeletePost,
   LikePost,
+  CommentPost,
+  getPostsBySearch,
 };
