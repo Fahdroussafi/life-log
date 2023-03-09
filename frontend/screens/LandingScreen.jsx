@@ -16,8 +16,7 @@ const HomeScreen = ({navigation}) => {
         source={wallpaper}
         className="w-full h-full object-cover"
         resizeMode="cover">
-        <TouchableOpacity
-          onPress={() => navigation.navigate('Home')}>
+        <TouchableOpacity onPress={() => navigation.navigate('Nav')}>
           <Text className="text-[#000000] font-[avenir] tracking-normal font-bold right-10 text-right text-2xl py-10 ">
             Skip
           </Text>
