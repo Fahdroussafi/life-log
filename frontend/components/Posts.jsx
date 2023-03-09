@@ -1,106 +1,179 @@
-import React, {useState} from 'react';
-import {View, Text, ActivityIndicator, Pressable, FlatList} from 'react-native';
-
-import {getPosts} from '../utils/service';
-import {isError, useQuery} from 'react-query';
-
+import React, {useState, useEffect, useCallback, useRef, useMemo} from 'react';
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  FlatList,
+  TextInput,
+  TouchableOpacity,
+  RefreshControl
+} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-
 import moment from 'moment';
+import {getPosts, searchPosts} from '../utils/service';
+import {useNavigation} from '@react-navigation/native';
 
-const Posts = ({navigation}) => {
-  const [showMore, setShowMore] = useState(1);
+import styles from '../components/styles';
 
-  const [data, setData] = useState({data: []});
+const Posts = () => {
+  const navigation = useNavigation();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [pageNumber, setPageNumber] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState([]);
+  const [endReached, setEndReached] = useState(false);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const showMorePosts = () => {
-    setShowMore(showMore + 1);
-  };
+  const flatListRef = useRef(null);
 
-  const {isLoading, error} = useQuery(
-    ['posts', showMore],
-    () => getPosts(showMore),
-    {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      cacheTime: 0,
+  const handleSearch = useCallback(async (searchText, page = 1) => {
+    try {
+      setLoading(true);
+      const {data} = await searchPosts({
+        search: searchText,
+        tags: 'none',
+      });
+      setData(prevData => (page === 1 ? data : [...prevData, ...data]));
+      setPageNumber(page);
+      setEndReached(false);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-      onSuccess: newData => {
-        setData(prevData => ({
-          prevData,
-          data: [...prevData.data, ...newData.data],
-        }));
-      },
-    },
+  const handleLoadMore = useCallback(() => {
+    if (pageNumber < totalPages) {
+      setPageNumber(pageNumber + 1);
+    } else {
+      setEndReached(true);
+    }
+  }, [pageNumber, totalPages]);
+
+  // console.log('currentPage', pageNumber);
+
+  // add index to each item in the data array
+  const dataWithIndex = useMemo(
+    () =>
+      data.map((item, index) => ({
+        ...item,
+        index,
+      })),
+    [data],
   );
 
-  if (isError(error)) {
-    return <Text>Error: {error}</Text>;
-  }
-
-  if (data.data.length === 0) {
-    return (
-      <View className="flex-1 bg-[#F6F6F6] relative">
-        <View className="flex flex-col items-center justify-center flex-1">
-          <Text className="text-black font-bold text-2xl">No more posts</Text>
+  const renderPost = ({item, index}) => (
+    <TouchableOpacity
+      key={`${item._id}-${item.index}`}
+      style={styles.postContainer}>
+      <View style={styles.postHeader}>
+        <Text style={styles.postAuthor}>By {item.creator}</Text>
+        <Text style={styles.postDate}>{moment(item.createdAt).fromNow()}</Text>
+      </View>
+      <View style={styles.postBody}>
+        <Text style={styles.postTitle}>{item.title}</Text>
+        <Text style={styles.postContent}>{item.content}</Text>
+      </View>
+      <View style={styles.postFooter}>
+        <View style={styles.postLikes}>
+          <Icon name="thumb-up" size={16} color="#20B08E" />
+          <Text style={styles.postLikesCount}>
+            {item.likes.length > 0 ? item.likes.length : 0}
+          </Text>
+        </View>
+        <View style={styles.postComments}>
+          <Icon name="comment" size={16} color="#20B08E" />
+          <Text style={styles.postCommentsCount}>
+            {item.comments.length > 0 ? item.comments.length : 0}
+          </Text>
         </View>
       </View>
-    );
-  }
+    </TouchableOpacity>
+  );
 
-  console.log(data.data.map(item => item._id));
+  const renderFooter = () => {
+    if (!loading) return null;
+
+    return (
+      <View style={{padding: 10}}>
+        <ActivityIndicator size="large" color="#20B08E" />
+      </View>
+    );
+  };
+
+  const renderEmpty = () => (
+    <View className="flex-1 bg-[#F6F6F6] items-center justify-center">
+      <Text className="text-black text-center">No posts found.</Text>
+    </View>
+  );
+
+  useEffect(() => {
+    if (searchQuery) {
+      handleSearch(searchQuery, 1);
+    } else {
+      setLoading(true);
+      getPosts(pageNumber)
+        .then(response => {
+          setData(prevData =>
+            pageNumber === 1 ? response.data : [...prevData, ...response.data],
+          );
+          setTotalPages(response.numberOfPages);
+        })
+        .catch(error => {
+          console.log(error);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }, [pageNumber, totalPages]);
 
   return (
-    <FlatList
-      className="flex-1 bg-[#F6F6F6] relative"
-      nestedScrollEnabled={true}
-      data={data.data}
-      renderItem={({item, index}) => (
-        <View
-          key={index}
-          className="flex flex-col items-center justify-center mx-4 p-2 ">
-          <View className="bg-white rounded-xl shadow-xl w-80 h-80 border-white border-2">
-            <View className="flex flex-col items-start mx-4 ">
-              <Text className="text-black font-bold text-base">
-                By {item.creator}
-              </Text>
-              <Text className="text-black font-bold text-base">
-                {moment(item.createdAt).fromNow()}
-              </Text>
-            </View>
-            <View className="p-3 pt-40 fixed">
-              <View className="bg-[#20B08E] w-full rounded-full p-2 flex flex-row justify-between ">
-                <Text className="text-black font-bold text-lg ml-4">
-                  <Icon name="location-on" size={16} color="#fff" />
-                  {item.title}
-                </Text>
-                <Text className="text-black font-bold text-lg mr-4">
-                  Likes:
-                  {item.likes && item.likes.length}
-                </Text>
-              </View>
-            </View>
-          </View>
-        </View>
-      )}
-      keyExtractor={(item, index) => index.toString()}
-      ListFooterComponentStyle={{
-        paddingBottom: 20,
-      }}
-      ListFooterComponent={
-        isLoading ? (
-          <ActivityIndicator size="large" color="#20B08E" />
-        ) : (
-          <View className=" flex flex-row justify-center items-center py-4">
-            <Pressable
-              className="bg-[#20B08E] p-2 rounded-full"
-              onPress={showMorePosts}>
-              <Text className="text-white font-bold text-lg">Show More</Text>
-            </Pressable>
-          </View>
-        )
-      }
-    />
+    <View className="flex-1 bg-[#F6F6F6]">
+      <View className="flex flex-row items-center justify-between mx-4 mt-4">
+        <Text className="text-black font-bold text-xl">
+          Create you own post
+        </Text>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Nav', {screen: 'New Post'})}>
+          <Icon name="add" size={30} color="#20B08E" />
+        </TouchableOpacity>
+      </View>
+
+      <View className="flex flex-row items-center justify-between mx-4 mt-4">
+        <TextInput
+          placeholder="Search posts"
+          placeholderTextColor={'#000'}
+          value={searchQuery}
+          onChangeText={text => setSearchQuery(text)}
+          style={{
+            backgroundColor: '#fff',
+            borderRadius: 20,
+            padding: 10,
+            marginBottom: 10,
+            width: '80%',
+            color: '#000',
+          }}
+        />
+        <TouchableOpacity
+          onPress={() => {
+            handleSearch(searchQuery, 1);
+          }}>
+          <Icon name="search" size={32} color="#20B08E" />
+        </TouchableOpacity>
+      </View>
+
+      <FlatList
+        data={dataWithIndex}
+        renderItem={renderPost}
+        keyExtractor={item => `${item._id}-${item.index}`}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={renderFooter}
+        ListEmptyComponent={renderEmpty}
+      />
+    </View>
   );
 };
 
