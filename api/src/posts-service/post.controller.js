@@ -6,13 +6,37 @@ const Post = require("./post.model");
 // @desc Create a post
 // @access Private
 const CreatePost = asyncHandler(async (req, res) => {
-  const post = req.body;
+  const { title, message, tags, selectedFile } = req.body;
+  if (!title || !message || !tags || !selectedFile) {
+    res.status(400);
+    throw new Error("PLEASE FILL ALL THE FIELDS");
+  }
 
-  const newPost = new Post(post);
+  const newPostMessage = new Post({
+    title,
+    message,
+    selectedFile,
+    tags,
+    creator: req.userId,
+  });
 
   try {
-    await newPost.save();
-    res.status(201).json(newPost);
+    await newPostMessage.save();
+
+    // retrieve the new post message from the database with the creator field populated
+    const populatedPostMessage = await Post.findById(
+      newPostMessage._id
+    ).populate("creator", "name");
+
+    // return the post message with the creator's name
+    res.status(201).json({
+      _id: populatedPostMessage._id,
+      title: populatedPostMessage.title,
+      message: populatedPostMessage.message,
+      tags: populatedPostMessage.tags,
+      selectedFile: populatedPostMessage.selectedFile,
+      creator: populatedPostMessage.creator.name,
+    });
   } catch (error) {
     res.status(409).json({ message: error.message });
   }
@@ -31,7 +55,8 @@ const GetPosts = asyncHandler(async (req, res) => {
     const posts = await Post.find()
       .sort({ _id: -1 })
       .limit(LIMIT)
-      .skip(startIndex);
+      .skip(startIndex)
+      .populate("creator", "name");
 
     res.json({
       data: posts,
@@ -140,7 +165,7 @@ const getPostsBySearch = asyncHandler(async (req, res) => {
 
     const posts = await Post.find({
       $or: [{ title }, { tags: { $in: tags.split(",") } }],
-    });
+    }).populate("creator", "name");
 
     res.json({ data: posts });
   } catch (error) {
