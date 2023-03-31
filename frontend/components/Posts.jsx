@@ -7,13 +7,17 @@ import {
   TextInput,
   TouchableOpacity,
   RefreshControl,
+  Image,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+
 import moment from 'moment';
 import {getPosts, searchPosts} from '../utils/service';
 import {useNavigation} from '@react-navigation/native';
 
 import styles from '../components/styles';
+
+import LikeButton from '../components/LikeButton';
 
 const Posts = () => {
   const navigation = useNavigation();
@@ -63,45 +67,46 @@ const Posts = () => {
     setPageNumber(pageNumber + 1);
   }, [pageNumber, totalPages]);
 
-  // console.log('currentPage', pageNumber);
-
   // add index to each item in the data array
-  const dataWithIndex = useMemo(
-    () =>
-      data.map((item, index) => ({
-        ...item,
-        index,
-      })),
-    [data],
-  );
+  // descrture data instead of passing the entire data array to the FlatList
+  const dataWithIndex = useMemo(() => {
+    return data.map((item, index) => ({...item, index}));
+  }, [data]);
 
   const renderPost = ({item, index}) => (
-    <TouchableOpacity
-      key={`${item._id}-${item.index}`}
-      style={styles.postContainer}>
-      <View style={styles.postHeader}>
-        <Text style={styles.postAuthor}>By {item.creator}</Text>
-        <Text style={styles.postDate}>{moment(item.createdAt).fromNow()}</Text>
-      </View>
-      <View style={styles.postBody}>
-        <Text style={styles.postTitle}>{item.title}</Text>
-        <Text style={styles.postContent}>{item.content}</Text>
-      </View>
-      <View style={styles.postFooter}>
-        <View style={styles.postLikes}>
-          <Icon name="thumb-up" size={16} color="#20B08E" />
-          <Text style={styles.postLikesCount}>
-            {item.likes.length > 0 ? item.likes.length : 0}
+    <View style={styles.postContainer}>
+      <TouchableOpacity
+        key={`${item._id}-${item.index}`}
+        onPress={() => navigation.navigate('App', {screen: 'Post'})}>
+        <Image
+          style={styles.postImage}
+          source={{uri: item.selectedFile}}
+          resizeMode="cover"
+        />
+        <View style={styles.postHeader}>
+          <Text style={styles.postAuthor}>By {item.creator.name}</Text>
+          <Text style={styles.postDate}>
+            {moment(item.createdAt).fromNow()}
           </Text>
         </View>
+        <View style={styles.postBody}>
+          <Text style={styles.postTitle}>{item.title}</Text>
+          <Text style={styles.postContent}>{item.content}</Text>
+        </View>
+      </TouchableOpacity>
+      <View style={styles.postFooter}>
+        <View style={styles.postLikes}>
+          <LikeButton postId={item._id} />
+        </View>
+
         <View style={styles.postComments}>
-          <Icon name="comment" size={16} color="#20B08E" />
+          <Icon name="comment" size={25} color="#20B08E" />
           <Text style={styles.postCommentsCount}>
             {item.comments.length > 0 ? item.comments.length : 0}
           </Text>
         </View>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 
   const renderFooter = () => {
@@ -118,7 +123,6 @@ const Posts = () => {
     if (loading) {
       return (
         <View className="flex-1 bg-[#F6F6F6] items-center justify-center">
-          <ActivityIndicator size="large" color="#20B08E" />
           <Text className="text-black text-center">Looking for posts...</Text>
         </View>
       );
@@ -153,13 +157,13 @@ const Posts = () => {
   }, [pageNumber]);
 
   return (
-    <View className="flex-1 bg-[#F6F6F6]">
+    <View className="flex-1 bg-[#242424]">
       <View className="flex flex-row items-center justify-between mx-4 mt-4">
-        <Text className="text-black font-bold text-xl">
+        <Text className="text-white font-bold text-xl tracking-widest">
           Create you own post
         </Text>
         <TouchableOpacity
-          onPress={() => navigation.navigate('Nav', {screen: 'New Post'})}>
+          onPress={() => navigation.navigate('Nav', {screen: 'Create Post'})}>
           <Icon name="add" size={30} color="#20B08E" />
         </TouchableOpacity>
       </View>
@@ -170,14 +174,7 @@ const Posts = () => {
           placeholderTextColor={'#000'}
           value={searchQuery}
           onChangeText={setSearchQuery}
-          style={{
-            backgroundColor: '#fff',
-            borderRadius: 20,
-            padding: 10,
-            marginBottom: 10,
-            width: '80%',
-            color: '#000',
-          }}
+          className="bg-[#FFF] p-2 mb-2 rounded-3xl w-[80%] text-black"
         />
         <TouchableOpacity
           onPress={() => {
@@ -188,6 +185,7 @@ const Posts = () => {
       </View>
 
       <FlatList
+        // initialNumToRender={5}
         data={dataWithIndex}
         renderItem={renderPost}
         keyExtractor={item => `${item._id}-${item.index}`}
