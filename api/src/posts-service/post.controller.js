@@ -132,7 +132,36 @@ const LikePost = asyncHandler(async (req, res) => {
     new: true,
   });
 
-  res.status(200).json(updatedPost);
+  const liked = post.likes.includes(req.userId);
+  res.status(200).json({ liked, updatedPost });
+});
+
+// Get Like Count
+const getLikeCount = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id))
+    return res.status(404).send(`No post with id: ${id}`);
+
+  const post = await Post.findById(id);
+
+  const likesCount = post.likes.length;
+
+  res.status(200).json({ likesCount });
+});
+
+// Check if the post is liked by the user
+const checkIfLiked = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id))
+    return res.status(404).send(`No post with id: ${id}`);
+
+  const post = await Post.findById(id);
+
+  const isLiked = post.likes.includes(req.userId);
+
+  res.status(200).json({ isLiked });
 });
 
 // @route POST api/posts/:id/commentpost
@@ -173,8 +202,25 @@ const getPostsBySearch = asyncHandler(async (req, res) => {
   }
 });
 
+// @route GET api/posts/:id
+// @desc Get a post
+// @access Private
+const getPost = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  try {
+    const post = await Post.findById(id).populate("creator", "name");
+
+    res.status(200).json(post);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+});
+
 module.exports = {
   CreatePost,
+  getPost,
+  getLikeCount,
+  checkIfLiked,
   GetPosts,
   UpdatePost,
   DeletePost,
