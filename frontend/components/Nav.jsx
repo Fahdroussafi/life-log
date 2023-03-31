@@ -31,9 +31,9 @@ const Tabs = () => {
               iconName = focused ? 'home' : 'home-filled';
             } else if (route.name === 'Login') {
               iconName = focused ? 'person' : 'person-outline';
-            } else if (route.name === 'Posts Liked') {
+            } else if (route.name === 'My Posts') {
               iconName = focused ? 'favorite' : 'favorite-border';
-            } else if (route.name === 'New Post') {
+            } else if (route.name === 'Create Post') {
               iconName = focused ? 'add-circle' : 'add-circle-outline';
             }
             return (
@@ -44,26 +44,30 @@ const Tabs = () => {
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}>
-                <View
-                  style={{
-                    width: 25,
-                    height: 25,
-                    borderRadius: 15,
-                    backgroundColor: focused ? '#20B08E' : 'transparent',
-                  }}>
-                  <Icon
-                    name={iconName}
-                    size={25}
-                    color={focused ? '#fff' : 'black'}
-                  />
-                  {focused && (
-                    <View
-                      style={{
-                        backgroundColor: '#fff',
-                      }}
+                <>
+                  <View
+                    style={{
+                      width: 30,
+                      height: 30,
+                      borderRadius: 30,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      backgroundColor: focused ? '#20B08E' : 'transparent',
+                    }}>
+                    <Icon
+                      name={iconName}
+                      size={25}
+                      color={focused ? '#fff' : 'black'}
                     />
-                  )}
-                </View>
+                    {focused && (
+                      <View
+                        style={{
+                          backgroundColor: '#fff',
+                        }}
+                      />
+                    )}
+                  </View>
+                </>
               </View>
             );
           },
@@ -72,11 +76,11 @@ const Tabs = () => {
           tabBarStyle: {
             display: 'flex',
             height: 45,
-            backgroundColor: '#fff',
+            backgroundColor: '#F6F6F6',
             borderTopLeftRadius: 35,
             borderTopRightRadius: 35,
           },
-          tabBarShowLabel: false,
+          // tabBarShowLabel: false,
         })}>
         <Tab.Screen
           name="Home"
@@ -84,17 +88,17 @@ const Tabs = () => {
           options={{headerShown: false}}
         />
         <Tab.Screen
-          name="New Post"
+          name="Create Post"
           component={NewPost}
           options={{headerShown: false}}
         />
         <Tab.Screen
-          name="Posts Liked"
+          name="My Posts"
           component={PostsLiked}
           options={{headerShown: false}}
         />
 
-        {!storedCredentials && (
+        {!storedCredentials.token && (
           <Tab.Screen
             name="Login"
             component={AuthScreen}
