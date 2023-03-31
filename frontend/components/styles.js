@@ -93,11 +93,13 @@ const styles = StyleSheet.create({
   },
 
   postContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: '#F6F6F6',
     borderRadius: 10,
     marginHorizontal: 8,
     marginVertical: 4,
     padding: 15,
+    marginRight: 10,
+    marginLeft: 10,
   },
   postHeader: {
     flexDirection: 'row',
@@ -152,6 +154,12 @@ const styles = StyleSheet.create({
     marginLeft: 4,
     fontSize: 14,
     color: '#888',
+  },
+  postImage: {
+    width: '100%',
+    height: 200,
+    opacity: 0.9,
+    borderRadius: 10,
   },
 });
 
