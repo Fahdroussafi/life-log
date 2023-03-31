@@ -59,12 +59,14 @@ export default function AuthScreen({navigation}) {
   );
 
   const persistLogin = async data => {
-    AsyncStorage.setItem('token', JSON.stringify(data.token));
-    AsyncStorage.setItem('user', JSON.stringify(data.result.name))
+    await AsyncStorage.multiSet([
+      ['token', data.token],
+      ['userName', data.result.name],
+      ['userId', data.result._id],
+    ])
       .then(() => {
-        setStoredCredentials(data.token);
-        setStoredCredentials(data.result.name);
-        console.log(data.result.name);
+        setStoredCredentials(data.token, data.result.name, data.result._id);
+        navigation.navigate('Nav', {screen: 'Home'});
       })
       .catch(error => {
         console.error(error);
