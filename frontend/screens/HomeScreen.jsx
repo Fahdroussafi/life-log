@@ -15,32 +15,33 @@ const HomeScreen = () => {
     AsyncStorage.clear()
       .then(() => {
         setStoredCredentials('');
-        // navigation.navigate('Auth', {screen: 'Login'});
       })
       .catch(error => console.log(error));
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-[#F6F6F6] relative">
-      <View className="p-5">
+    <SafeAreaView className="flex-1 bg-[#242424] relative ">
+      <View className="p-4 ">
         <View className="flex flex-row justify-between items-center">
-          <Text className="text-black text-2xl py-5">
+          <Text className="text-white text-2xl py-5 tracking-widest font-[avenir] font-bold">
             Hi{' '}
-            <Text className="text-black font-bold text-2xl font-[avenir]">
-              {storedCredentials ? storedCredentials : 'Guest'}
+            <Text className="text-white font-bold text-2xl font-[avenir]">
+              {storedCredentials.userName
+                ? storedCredentials.userName
+                : 'Guest'}
             </Text>
           </Text>
-          {storedCredentials && (
+          {storedCredentials.userName && (
             <TouchableOpacity
               className="w-28 bg-[#20B08E] p-2 rounded-full"
               onPress={clearLogin}>
-              <Text className="text-[#FFFFFF] font-[avenir] font-bold tracking-widest text-base text-center">
-                Logout
+              <Text className="text-white font-[avenir] font-bold tracking-widest text-base text-center">
+                LOGOUT
               </Text>
             </TouchableOpacity>
           )}
         </View>
-        <Text className="text-black font-extrabold tracking-normal text-3xl font-[avenir]">
+        <Text className="text-white font-extrabold tracking-widest text-2xl font-[avenir]">
           Where do you want to go ?
         </Text>
       </View>
