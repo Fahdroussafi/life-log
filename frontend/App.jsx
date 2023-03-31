@@ -5,7 +5,7 @@
  * @format
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useCallback} from 'react';
 
 import {QueryClient, QueryClientProvider} from 'react-query';
 
@@ -22,20 +22,32 @@ const queryClient = new QueryClient();
 
 function Root() {
   const [appReady, setAppReady] = useState(false);
-  const [storedCredentials, setStoredCredentials] = useState('');
+  const [storedCredentials, setStoredCredentials] = useState({});
 
   const checkLoginCredentials = () => {
-    AsyncStorage.getItem('token')
-    AsyncStorage.getItem('user')
-      .then(result => {
-        if (result !== null) {
-          setStoredCredentials(JSON.parse(result));
-        } else {
-          setStoredCredentials(null);
+    AsyncStorage.multiGet(['token', 'userName', 'userId'])
+      .then(value => {
+        if (value !== null) {
+          console.log(value);
+          setStoredCredentials({
+            token: value[0][1],
+            userName: value[1][1],
+            userId: value[2][1],
+          });
         }
       })
-      .catch(error => console.log(error));
+      .catch(error => {
+        console.log(error);
+      });
   };
+
+  const onSignIn = useCallback((token, userName, userId) => {
+    setStoredCredentials({token, userName, userId});
+  }, []);
+
+  const signOut = useCallback(() => {
+    setStoredCredentials({});
+  }, []);
 
   useEffect(() => {
     checkLoginCredentials();
@@ -44,7 +56,11 @@ function Root() {
 
   return (
     <CredentialsContext.Provider
-      value={{storedCredentials, setStoredCredentials}}>
+      value={{
+        storedCredentials,
+        setStoredCredentials: onSignIn,
+        signOut,
+      }}>
       <QueryClientProvider client={queryClient}>
         {appReady && <RootStack />}
       </QueryClientProvider>
