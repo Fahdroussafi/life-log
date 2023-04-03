@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
   },
 
   postContainer: {
-    backgroundColor: '#F6F6F6',
+    // backgroundColor: '#F6F6F6',
     borderRadius: 10,
     marginHorizontal: 8,
     marginVertical: 4,
@@ -131,8 +131,6 @@ const styles = StyleSheet.create({
   postFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    borderTopWidth: 1,
-    borderTopColor: '#ddd',
     paddingTop: 8,
   },
   postLikes: {
