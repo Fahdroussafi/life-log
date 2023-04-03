@@ -20,6 +20,7 @@
     "nativewind": "^2.0.11",
     "react": "18.2.0",
     "react-native": "0.71.3",
+    "react-native-config": "^1.5.0",
     "react-native-image-picker": "^5.3.1",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-reanimated": "^2.14.4",
