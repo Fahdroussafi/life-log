@@ -5,12 +5,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import {CredentialsContext} from './../components/CredentialsContext';
 import {useNavigation} from '@react-navigation/native';
+import {API_URL} from '../env';
 
 const LikeButton = ({postId}) => {
   const navigation = useNavigation();
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
-  const baseUrl = 'http://192.168.1.3:8080';
 
   const {storedCredentials, setStoredCredentials} =
     useContext(CredentialsContext);
@@ -22,7 +22,7 @@ const LikeButton = ({postId}) => {
         const token = await AsyncStorage.getItem('token');
         if (token) {
           const res = await axios.get(
-            `${baseUrl}/api/posts/${postId}/checkIfLiked`,
+            `${API_URL}/api/posts/${postId}/checkIfLiked`,
             {
               headers: {Authorization: `Bearer ${token}`},
             },
@@ -41,7 +41,7 @@ const LikeButton = ({postId}) => {
     const getLikesCount = async () => {
       try {
         const res = await axios.get(
-          `${baseUrl}/api/posts/${postId}/likesCount`,
+          `${API_URL}/api/posts/${postId}/likesCount`,
         );
         setLikesCount(res.data.likesCount);
       } catch (err) {
@@ -62,7 +62,7 @@ const LikeButton = ({postId}) => {
       const token = await AsyncStorage.getItem('token');
       if (token) {
         const res = await axios.patch(
-          `${baseUrl}/api/posts/${postId}/likePost`,
+          `${API_URL}/api/posts/${postId}/likePost`,
           {},
           {headers: {Authorization: `Bearer ${token}`}},
         );
@@ -81,7 +81,7 @@ const LikeButton = ({postId}) => {
           const token = await AsyncStorage.getItem('token');
           if (token) {
             const res = await axios.get(
-              `${baseUrl}/api/posts/${postId}/checkIfLiked`,
+              `${API_URL}/api/posts/${postId}/checkIfLiked`,
               {
                 headers: {Authorization: `Bearer ${token}`},
               },
@@ -101,15 +101,20 @@ const LikeButton = ({postId}) => {
   }, [navigation]);
 
   return (
-    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingTop: 5,
+      }}>
       <TouchableOpacity onPress={handleLike}>
         <MaterialCommunityIcons
           name={liked ? 'favorite' : 'favorite-border'}
           size={24}
-          color={liked ? 'red' : 'black'}
+          color={liked ? 'red' : 'white'}
         />
       </TouchableOpacity>
-      <Text style={{marginLeft: 5, color: 'black'}}>{likesCount}</Text>
+      <Text style={{marginLeft: 5, color: 'white'}}>{likesCount}</Text>
     </View>
   );
 };
