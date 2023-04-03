@@ -22,7 +22,7 @@ const Tabs = () => {
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : null}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
-      style={{flex: 1}}>
+      style={{flex: 1, backgroundColor: '#242424'}}>
       <Tab.Navigator
         screenOptions={({route}) => ({
           tabBarIcon: ({focused}) => {
@@ -75,7 +75,7 @@ const Tabs = () => {
           tabBarInactiveTintColor: 'black',
           tabBarStyle: {
             display: 'flex',
-            height: 45,
+            height: 50,
             backgroundColor: '#F6F6F6',
             borderTopLeftRadius: 35,
             borderTopRightRadius: 35,
