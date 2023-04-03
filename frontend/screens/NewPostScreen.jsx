@@ -26,6 +26,8 @@ import {CredentialsContext} from '../components/CredentialsContext';
 import SpinnerButton from 'react-native-spinner-button';
 import Toast from 'react-native-toast-message';
 
+import {API_URL} from '../env';
+
 const NewPost = ({navigation}) => {
   //context
   const {storedCredentials, setStoredCredentials} =
@@ -36,8 +38,6 @@ const NewPost = ({navigation}) => {
   const [tags, setTags] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
   const [loading, setLoading] = useState(false);
-
-  const baseUrl = 'http://192.168.1.3:8080';
 
   const createPost = async () => {
     if (title === '' || message === '' || tags.length === 0) {
@@ -82,7 +82,7 @@ const NewPost = ({navigation}) => {
             selectedFile: imageUrl,
           });
           const res = await axios.post(
-            `${baseUrl}/api/posts/createPost`,
+            `${API_URL}/api/posts/createPost`,
             body,
             config,
           );
@@ -111,7 +111,7 @@ const NewPost = ({navigation}) => {
     }
   };
 
-  if (!storedCredentials) {
+  if (!storedCredentials.token) {
     return (
       <View
         style={{
@@ -166,7 +166,7 @@ const NewPost = ({navigation}) => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: '#F6F6F6'}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: '#242424'}}>
       <KeyboardAwareScrollView>
         <ScrollView
           contentContainerStyle={styles.container}
@@ -175,7 +175,7 @@ const NewPost = ({navigation}) => {
           <TextInput
             style={styles.input}
             placeholder="Title"
-            placeholderTextColor={'#333'}
+            placeholderTextColor={'#FFF'}
             value={title}
             onChangeText={setTitle}
           />
@@ -185,11 +185,11 @@ const NewPost = ({navigation}) => {
             placeholder="Message"
             value={message}
             onChangeText={setMessage}
-            placeholderTextColor={'#333'}
+            placeholderTextColor={'#FFF'}
             multiline
             numberOfLines={4}
           />
-          <Text style={{marginBottom: 8, color: '#333'}}>Enter your tags</Text>
+          <Text style={{marginBottom: 8, color: '#FFF'}}>Enter your tags</Text>
           <Tags
             initialTags={tags}
             onChangeTags={newTags => setTags(newTags)}
@@ -203,7 +203,7 @@ const NewPost = ({navigation}) => {
             inputWrapperStyle={{
               backgroundColor: '#eee',
               borderWidth: 1,
-              borderColor: '#ccc',
+              borderColor: '#FFF',
               borderRadius: 5,
               padding: 8,
               marginBottom: 16,
@@ -213,14 +213,14 @@ const NewPost = ({navigation}) => {
               <TouchableOpacity key={`${tag}-${index}`} onPress={onPress}>
                 <View
                   style={{
-                    backgroundColor: '#eee',
+                    backgroundColor: '#20B08E',
                     padding: 8,
                     borderRadius: 5,
                     flexDirection: 'row',
                     alignItems: 'center',
                     marginRight: 8,
                   }}>
-                  <Text style={{color: '#000', marginRight: 8}}>{tag}</Text>
+                  <Text style={{color: '#FFF', marginRight: 8}}>{tag}</Text>
                   <Icon name="close" size={16} color="#333" />
                 </View>
               </TouchableOpacity>
@@ -292,11 +292,11 @@ const styles = {
     marginBottom: 16,
   },
   header: {
-    fontSize: 24,
+    fontSize: 18,
     textAlign: 'center',
     fontWeight: 'bold',
     marginBottom: 16,
-    color: '#333',
+    color: '#FFF',
     letterSpacing: 2,
     fontFamily: 'avenir',
   },
@@ -306,16 +306,16 @@ const styles = {
     borderRadius: 5,
     padding: 8,
     marginBottom: 16,
-    color: '#000',
+    color: '#FFF',
     fontFamily: 'avenir',
   },
   multilineInput: {
     height: 100,
     textAlignVertical: 'top',
-    color: '#333',
+    color: '#FFF',
   },
   uploadText: {
-    color: 'black',
+    color: '#FFF',
     padding: 8,
     borderRadius: 5,
     width: 300,
