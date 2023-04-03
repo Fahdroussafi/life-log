@@ -59,6 +59,8 @@ const LikeButton = ({postId}) => {
 
   const handleLike = async () => {
     try {
+      setLiked(!liked); // Optimistic UI update
+      setLikesCount(liked ? likesCount - 1 : likesCount + 1); // Optimistic UI update
       const token = await AsyncStorage.getItem('token');
       if (token) {
         const res = await axios.patch(
