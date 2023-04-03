@@ -169,11 +169,11 @@ const checkIfLiked = asyncHandler(async (req, res) => {
 // @access Private
 const CommentPost = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { value } = req.body;
+  const { comment } = req.body;
 
   const post = await Post.findById(id);
 
-  post.comments.push(value);
+  post.comments.push(comment);
 
   const updatedPost = await Post.findByIdAndUpdate(id, post, {
     new: true,
