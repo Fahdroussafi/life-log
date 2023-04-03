@@ -33,3 +33,18 @@ export async function searchPosts(searchQuery) {
   );
   return response.data;
 }
+
+export async function getPost(postId) {
+  const response = await axios.get(`${API_URL}/api/posts/${postId}`);
+  return response.data;
+}
+
+export async function CommentOnPost({postId, comment}) {
+  const response = await axios.post(
+    `${API_URL}/api/posts/${postId}/commentPost`,
+    {
+      comment,
+    },
+  );
+  return response.data;
+}
