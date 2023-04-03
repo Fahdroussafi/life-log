@@ -28,6 +28,7 @@ const Posts = () => {
   const [endReached, setEndReached] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
   const [refreshing, setRefreshing] = useState(false);
+  const [searching, setSearching] = useState(false);
 
   const flatListRef = useRef(null);
 
@@ -45,6 +46,7 @@ const Posts = () => {
   const handleSearch = useCallback(async (searchText, page = 1) => {
     try {
       setLoading(true);
+      setSearching(true);
       const {data} = await searchPosts({
         search: searchText,
         tags: 'none',
@@ -59,6 +61,7 @@ const Posts = () => {
       console.log(error);
     } finally {
       setLoading(false);
+      setSearching(false);
     }
   }, []);
 
@@ -73,41 +76,36 @@ const Posts = () => {
     return data.map((item, index) => ({...item, index}));
   }, [data]);
 
-  const renderPost = ({item, index}) => (
-    <View style={styles.postContainer}>
-      <TouchableOpacity
-        key={`${item._id}-${item.index}`}
-        onPress={() => navigation.navigate('App', {screen: 'Post'})}>
-        <Image
-          style={styles.postImage}
-          source={{uri: item.selectedFile}}
-          resizeMode="cover"
-        />
-        <View style={styles.postHeader}>
-          <Text style={styles.postAuthor}>By {item.creator.name}</Text>
+  const renderPost = useCallback(
+    ({item, index}) => (
+      <View style={styles.postContainer}>
+        <TouchableOpacity
+          key={`${item._id}-${item.index}`}
+          onPress={() => navigation.navigate('App', {screen: 'Post'})}>
+          <Image
+            style={styles.postImage}
+            source={{uri: item.selectedFile}}
+            resizeMode="cover"
+          />
           <Text style={styles.postDate}>
             {moment(item.createdAt).fromNow()}
           </Text>
-        </View>
-        <View style={styles.postBody}>
-          <Text style={styles.postTitle}>{item.title}</Text>
-          <Text style={styles.postContent}>{item.content}</Text>
-        </View>
-      </TouchableOpacity>
-      <View style={styles.postFooter}>
-        <View style={styles.postLikes}>
+        </TouchableOpacity>
+        <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
           <LikeButton postId={item._id} />
-        </View>
-
-        <View style={styles.postComments}>
-          <Icon name="comment" size={25} color="#20B08E" />
-          <Text style={styles.postCommentsCount}>
-            {item.comments.length > 0 ? item.comments.length : 0}
-          </Text>
+          <View style={styles.postComments}>
+            <Icon name="comment" size={24} color="#20B08E" />
+            <Text style={{color: '#20B08E', marginLeft: 5}}>
+              {item.comments.length}
+            </Text>
+          </View>
         </View>
       </View>
-    </View>
+    ),
+    [navigation],
   );
+
+  const MemoizedRenderPost = React.useMemo(() => renderPost, [renderPost]);
 
   const renderFooter = () => {
     if (!loading) return null;
@@ -154,7 +152,7 @@ const Posts = () => {
           setLoading(false);
         });
     }
-  }, [pageNumber]);
+  }, [pageNumber, searchQuery]);
 
   return (
     <View className="flex-1 bg-[#242424]">
@@ -173,9 +171,17 @@ const Posts = () => {
           placeholder="Search posts"
           placeholderTextColor={'#000'}
           value={searchQuery}
-          onChangeText={setSearchQuery}
+          onChangeText={text => {
+            setSearchQuery(text);
+            if (text.length > 0) {
+              setEndReached(false);
+              setTotalPages(1);
+              handleSearch(text);
+            }
+          }}
           className="bg-[#FFF] p-2 mb-2 rounded-3xl w-[80%] text-black"
         />
+        {searching && <ActivityIndicator size="small" color="#20B08E" />}
         <TouchableOpacity
           onPress={() => {
             handleSearch(searchQuery, 1);
@@ -187,7 +193,7 @@ const Posts = () => {
       <FlatList
         // initialNumToRender={5}
         data={dataWithIndex}
-        renderItem={renderPost}
+        renderItem={MemoizedRenderPost}
         keyExtractor={item => `${item._id}-${item.index}`}
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.5}
