@@ -24,6 +24,7 @@ const Posts = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [pageNumber, setPageNumber] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [searchloading, setSearchLoading] = useState(false);
   const [data, setData] = useState([]);
   const [endReached, setEndReached] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
@@ -45,7 +46,7 @@ const Posts = () => {
 
   const handleSearch = useCallback(async (searchText, page = 1) => {
     try {
-      setLoading(true);
+      setSearchLoading(true);
       setSearching(true);
       const {data} = await searchPosts({
         search: searchText,
@@ -60,7 +61,7 @@ const Posts = () => {
     } catch (error) {
       console.log(error);
     } finally {
-      setLoading(false);
+      setSearchLoading(false);
       setSearching(false);
     }
   }, []);
@@ -81,7 +82,12 @@ const Posts = () => {
       <View style={styles.postContainer}>
         <TouchableOpacity
           key={`${item._id}-${item.index}`}
-          onPress={() => navigation.navigate('App', {screen: 'Post'})}>
+          onPress={() =>
+            navigation.navigate('App', {
+              screen: 'Post',
+              params: {postId: item._id},
+            })
+          }>
           <Image
             style={styles.postImage}
             source={{uri: item.selectedFile}}
@@ -155,7 +161,7 @@ const Posts = () => {
   }, [pageNumber, searchQuery]);
 
   return (
-    <View className="flex-1 bg-[#242424]">
+    <View className="flex-1 bg-[#3B3C36]">
       <View className="flex flex-row items-center justify-between mx-4 mt-4">
         <Text className="text-white font-bold text-xl tracking-widest">
           Create you own post
