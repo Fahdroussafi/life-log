@@ -25,9 +25,8 @@ router.patch("/:id/likePost", auth, LikePost);
 // router.delete("/:id/", DeletePost);
 router.get("/:id/checkIfLiked", auth, checkIfLiked);
 
-
 // router.get("/creator", getPostsByCreator);
-router.post("/:id/commentPost", CommentPost);
+router.post("/:id/commentPost", auth, CommentPost);
 router.get("/:id", getPost);
 
 module.exports = router;
