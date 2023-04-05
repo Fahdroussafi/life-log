@@ -6,7 +6,6 @@
  */
 
 import React, {useEffect, useState, useCallback} from 'react';
-
 import {QueryClient, QueryClientProvider} from 'react-query';
 
 // aysnc-storage
@@ -28,7 +27,6 @@ function Root() {
     AsyncStorage.multiGet(['token', 'userName', 'userId'])
       .then(value => {
         if (value !== null) {
-          console.log(value);
           setStoredCredentials({
             token: value[0][1],
             userName: value[1][1],
