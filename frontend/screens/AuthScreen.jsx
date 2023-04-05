@@ -6,8 +6,8 @@ import {
   Dimensions,
   TextInput,
   Pressable,
-  Alert,
   ActivityIndicator,
+  ToastAndroid,
 } from 'react-native';
 import styles from '../components/styles';
 import Svg, {Image, Ellipse, ClipPath} from 'react-native-svg';
@@ -39,8 +39,7 @@ export default function AuthScreen({navigation}) {
   const [name, setName] = useState('');
 
   //context
-  const {storedCredentials, setStoredCredentials} =
-    useContext(CredentialsContext);
+  const {setStoredCredentials} = useContext(CredentialsContext);
 
   const {mutate, isLoading, error} = useMutation(
     isRegistering ? register : login,
@@ -50,13 +49,28 @@ export default function AuthScreen({navigation}) {
         navigation.navigate('Nav', {screen: 'Home'});
       },
       onError: error => {
-        Alert.alert('Error', error.response.data.message);
+        ToastAndroid.show(error.response.data.message, ToastAndroid.SHORT);
       },
       isLoading: setTimeout(() => {
         return isLoading;
       }, 5000),
     },
   );
+
+  const handleLogin = () => {
+    if (!email || !password) {
+      ToastAndroid.show('Please fill in all fields', ToastAndroid.SHORT);
+    } else if (!email.includes('@')) {
+      ToastAndroid.show('Please enter a valid email', ToastAndroid.SHORT);
+    } else if (isRegistering && password.length < 6) {
+      ToastAndroid.show(
+        'Password must be at least 6 characters',
+        ToastAndroid.SHORT,
+      );
+    } else {
+      mutate({email, password, name});
+    }
+  };
 
   const persistLogin = async data => {
     await AsyncStorage.multiSet([
@@ -172,7 +186,7 @@ export default function AuthScreen({navigation}) {
             placeholderTextColor="white"
             autoCapitalize="none"
             keyboardType="email-address"
-            style={styles.textInput}
+            style={styles.textInputForm}
             onChangeText={text => setEmail(text)}
             value={email}
           />
@@ -180,7 +194,7 @@ export default function AuthScreen({navigation}) {
             <TextInput
               placeholder="Enter your name"
               placeholderTextColor="white"
-              style={styles.textInput}
+              style={styles.textInputForm}
               onChangeText={text => setName(text)}
               value={name}
             />
@@ -189,7 +203,7 @@ export default function AuthScreen({navigation}) {
             placeholder="********"
             placeholderTextColor="white"
             secureTextEntry={true}
-            style={styles.textInput}
+            style={styles.textInputForm}
             onChangeText={text => setPassword(text)}
             value={password}
           />
@@ -203,7 +217,9 @@ export default function AuthScreen({navigation}) {
               }>
               <Text
                 style={styles.buttonText}
-                onPress={() => mutate({email, password, name})}>
+                onPress={() => {
+                  handleLogin();
+                }}>
                 {isRegistering ? 'REGISTER' : 'LOG IN'}
               </Text>
             </Pressable>
