@@ -5,7 +5,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'flex-end',
-    backgroundColor: '#F6F6F6',
+    // backgroundColor: '#F6F6F6',
+    backgroundColor: '#fff',
   },
   button: {
     backgroundColor: '#20B08E',
@@ -21,7 +22,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'white',
+    color: 'black',
     letterSpacing: 1,
   },
   bottomContainer: {
@@ -29,6 +30,18 @@ const styles = StyleSheet.create({
     height: height / 3,
   },
   textInput: {
+    height: 40,
+    borderWidth: 1,
+    borderColor: '#20B08E',
+    marginHorizontal: 20,
+    marginVertical: 10,
+    borderRadius: 25,
+    paddingLeft: 10,
+    color: 'black',
+    textAlign: 'center',
+    backgroundColor: '#010101',
+  },
+  textInputForm: {
     height: 40,
     borderWidth: 1,
     borderColor: '#20B08E',
@@ -93,13 +106,12 @@ const styles = StyleSheet.create({
   },
 
   postContainer: {
-    // backgroundColor: '#F6F6F6',
+    backgroundColor: '#fff',
     borderRadius: 10,
-    marginHorizontal: 8,
     marginVertical: 4,
-    padding: 15,
     marginRight: 10,
     marginLeft: 10,
+    marginTop: 10,
   },
   postHeader: {
     flexDirection: 'row',
@@ -122,6 +134,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     marginBottom: 4,
+    marginRight: 10,
     color: '#000',
   },
   postContent: {
@@ -139,13 +152,14 @@ const styles = StyleSheet.create({
   },
 
   postLikesCount: {
-    marginLeft: 4,
+    // marginLeft: 4,
     fontSize: 14,
     color: '#888',
   },
   postComments: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginLeft: 20,
   },
 
   postCommentsCount: {
@@ -158,6 +172,79 @@ const styles = StyleSheet.create({
     height: 200,
     opacity: 0.9,
     borderRadius: 10,
+  },
+  postLoading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  postLoadingText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#888',
+  },
+  postScreenContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  postHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: 10,
+    marginTop: 20,
+  },
+  postFooter: {
+    flexDirection: 'row',
+    marginBottom: 10,
+    width: '100%',
+    alignItems: 'center',
+    // backgroundColor: '#242424',
+  },
+  postCommentContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+  },
+  postCommentsText: {
+    color: '#20B08E',
+    marginLeft: 5,
+  },
+  postCreatorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 10,
+    marginLeft: 10,
+  },
+  postCreator: {
+    color: '#000',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  postCommentsContainer: {
+    width: '100%',
+    height: '100%',
+    marginBottom: 10,
+    marginTop: 20,
+  },
+  postCommentItemContainer: {
+    backgroundColor: '#FFF',
+    borderRadius: 10,
+    marginVertical: 5,
+    marginHorizontal: 10,
+  },
+  postCommentItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    justifyContent: 'space-between',
+  },
+  postCommentLine: {
+    borderBottomColor: '#ccc',
+    borderBottomWidth: 1,
+    marginTop: 10,
+    marginBottom: 10,
   },
 });
 
