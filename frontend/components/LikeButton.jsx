@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useContext, useCallback} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import {TouchableOpacity, View, Text, ToastAndroid} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -11,35 +11,53 @@ const LikeButton = ({postId}) => {
   const navigation = useNavigation();
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
-  const {storedCredentials} = useContext(CredentialsContext);
 
-  const checkLiked = useCallback(async () => {
-    try {
-      const token = await AsyncStorage.getItem('token');
-      if (token) {
-        const res = await axios.get(
-          `${API_URL}/api/posts/${postId}/checkIfLiked`,
-          {headers: {Authorization: `Bearer ${token}`}},
-        );
-        setLiked(res.data.isLiked);
-      } else {
-        setLiked(false);
+  const {storedCredentials, setStoredCredentials} =
+    useContext(CredentialsContext);
+
+  useEffect(() => {
+    // Check if the post is liked by the user
+    const checkLiked = async () => {
+      try {
+        const token = await AsyncStorage.getItem('token');
+        if (token) {
+          const res = await axios.get(
+            `${API_URL}/api/posts/${postId}/checkIfLiked`,
+            {
+              headers: {Authorization: `Bearer ${token}`},
+            },
+          );
+          setLiked(res.data.isLiked);
+        } else {
+          setLiked(false);
+        }
+      } catch (err) {
+        console.log(err);
       }
-    } catch (err) {
-      console.log(err);
-    }
-  }, [postId]);
+    };
+    checkLiked();
 
-  const getLikesCount = useCallback(async () => {
-    try {
-      const res = await axios.get(`${API_URL}/api/posts/${postId}/likesCount`);
-      setLikesCount(res.data.likesCount);
-    } catch (err) {
-      console.log(err);
-    }
-  }, [postId]);
+    // Get the total number of likes for the post
+    const getLikesCount = async () => {
+      try {
+        const res = await axios.get(
+          `${API_URL}/api/posts/${postId}/likesCount`,
+        );
+        setLikesCount(res.data.likesCount);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getLikesCount();
 
-  const handleLike = useCallback(async () => {
+    // Reset state when credentials are cleared
+    if (!storedCredentials) {
+      setLiked(false);
+      setLikesCount(0);
+    }
+  }, [postId, storedCredentials]);
+
+  const handleLike = async () => {
     try {
       if (!storedCredentials.token) {
         ToastAndroid.show(
@@ -64,26 +82,41 @@ const LikeButton = ({postId}) => {
     } catch (err) {
       console.log(err);
     }
-  }, [postId, liked, likesCount]);
+  };
 
   useEffect(() => {
-    Promise.all([checkLiked(), getLikesCount()]);
-  }, [checkLiked, getLikesCount]);
+    const unsubscribe = navigation.addListener('focus', () => {
+      const checkLiked = async () => {
+        try {
+          const token = await AsyncStorage.getItem('token');
+          if (token) {
+            const res = await axios.get(
+              `${API_URL}/api/posts/${postId}/checkIfLiked`,
+              {
+                headers: {Authorization: `Bearer ${token}`},
+              },
+            );
+            setLiked(res.data.isLiked);
+          } else {
+            setLiked(false);
+          }
+        } catch (err) {
+          console.log(err);
+        }
+      };
+      checkLiked();
+    });
 
-  useEffect(() => {
-    if (!storedCredentials) {
-      setLiked(false);
-      setLikesCount(0);
-    }
-  }, [storedCredentials]);
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', checkLiked);
     return unsubscribe;
-  }, [navigation, checkLiked]);
+  }, [navigation]);
 
   return (
-    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        // paddingTop: 5,
+      }}>
       <TouchableOpacity onPress={handleLike}>
         <MaterialCommunityIcons
           name={liked ? 'favorite' : 'favorite-border'}
