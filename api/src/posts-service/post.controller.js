@@ -69,25 +69,6 @@ const GetPosts = asyncHandler(async (req, res) => {
   }
 });
 
-// @route PATCH api/posts/:id
-// @desc Update a post
-// @access Private
-const UpdatePost = asyncHandler(async (req, res) => {
-  const { id: _id } = req.params;
-  const post = req.body;
-
-  if (!mongoose.Types.ObjectId.isValid(_id))
-    return res.status(404).send("No post with that id");
-
-  const updatedPost = await Post.findByIdAndUpdate(_id, post, {
-    new: true,
-  });
-  res.status(201).send({
-    updatedPost: updatedPost,
-    message: "Post updated successfully",
-  });
-});
-
 // @route DELETE api/posts/:id
 // @desc Delete a post
 // @access Private
