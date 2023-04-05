@@ -7,6 +7,7 @@ import {
   Alert,
   Image,
   SafeAreaView,
+  ToastAndroid,
 } from 'react-native';
 import React, {useState, useContext} from 'react';
 
@@ -24,7 +25,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {CredentialsContext} from '../components/CredentialsContext';
 
 import SpinnerButton from 'react-native-spinner-button';
-import Toast from 'react-native-toast-message';
 
 import {API_URL} from '../env';
 
@@ -41,16 +41,10 @@ const NewPost = ({navigation}) => {
 
   const createPost = async () => {
     if (title === '' || message === '' || tags.length === 0) {
-      Toast.show({
-        type: 'error',
-        position: 'bottom',
-        text1: 'Error',
-        text2: 'Please fill in all the fields',
-        visibilityTime: 4000,
-        autoHide: true,
-        topOffset: 40,
-        bottomOffset: 40,
-      });
+      ToastAndroid.show(
+        'Please fill in all the fields to create a new post',
+        ToastAndroid.SHORT,
+      );
     } else if (selectedFile) {
       setLoading(true);
       {
@@ -86,18 +80,8 @@ const NewPost = ({navigation}) => {
             body,
             config,
           );
-          // console.log(res.data);
 
-          Toast.show({
-            type: 'success',
-            position: 'bottom',
-            text1: 'Success',
-            text2: 'Post created successfully',
-            visibilityTime: 4000,
-            autoHide: true,
-            topOffset: 40,
-            bottomOffset: 40,
-          });
+          ToastAndroid.show('Post created successfully', ToastAndroid.SHORT);
           setLoading(false);
           setTitle('');
           setMessage('');
@@ -274,7 +258,6 @@ const NewPost = ({navigation}) => {
           </View>
         </ScrollView>
       </KeyboardAwareScrollView>
-      <Toast />
     </SafeAreaView>
   );
 };
