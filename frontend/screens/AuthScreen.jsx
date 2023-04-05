@@ -46,7 +46,7 @@ export default function AuthScreen({navigation}) {
     {
       onSuccess: data => {
         persistLogin(data);
-        navigation.navigate('Nav', {screen: 'Home'});
+        // navigation.navigate('Nav', {screen: 'Home'});
       },
       onError: error => {
         ToastAndroid.show(error.response.data.message, ToastAndroid.SHORT);
@@ -80,7 +80,7 @@ export default function AuthScreen({navigation}) {
     ])
       .then(() => {
         setStoredCredentials(data.token, data.result.name, data.result._id);
-        navigation.navigate('Nav', {screen: 'Home'});
+        // navigation.navigate('Nav', {screen: 'Home'});
       })
       .catch(error => {
         console.error(error);
