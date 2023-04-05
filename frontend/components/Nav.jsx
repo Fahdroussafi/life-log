@@ -15,14 +15,13 @@ import {View, KeyboardAvoidingView, Platform} from 'react-native';
 const Tab = createBottomTabNavigator();
 
 const Tabs = () => {
-  const {storedCredentials, setStoredCredentials} =
-    useContext(CredentialsContext);
+  const {storedCredentials} = useContext(CredentialsContext);
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : null}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
-      style={{flex: 1, backgroundColor: '#242424'}}>
+      style={{flex: 1, backgroundColor: '#fff'}}>
       <Tab.Navigator
         screenOptions={({route}) => ({
           tabBarIcon: ({focused}) => {
@@ -79,6 +78,12 @@ const Tabs = () => {
             backgroundColor: '#F6F6F6',
             borderTopLeftRadius: 35,
             borderTopRightRadius: 35,
+            elevation: 10,
+            shadowColor: '#000',
+            shadowOffset: {
+              width: 0,
+              height: 5,
+            },
           },
           // tabBarShowLabel: false,
         })}>
