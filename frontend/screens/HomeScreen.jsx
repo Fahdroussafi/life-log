@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {CredentialsContext} from './../components/CredentialsContext';
 
-import Posts from '../components/Posts';
+import Posts from '../components/Posts/Posts';
 
 const HomeScreen = () => {
   const {storedCredentials, setStoredCredentials} =
