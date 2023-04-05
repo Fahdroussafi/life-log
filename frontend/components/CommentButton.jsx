@@ -1,37 +1,66 @@
-import React, {useState} from 'react';
-import {View, Text, Image, TextInput} from 'react-native';
+import React, {useState, useContext} from 'react';
+import {View, Text, TextInput, ToastAndroid} from 'react-native';
 
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import {useMutation} from 'react-query';
 import {CommentOnPost} from '../utils/service';
 
+import {CredentialsContext} from '../components/CredentialsContext';
+
 const CommentButton = ({postId, onCommentSubmitted}) => {
+  const {storedCredentials} = useContext(CredentialsContext);
+
   const [comment, setComment] = useState('');
 
   const {mutate} = useMutation(CommentOnPost, {
     onSuccess: data => {
-      console.log(data.comments);
       setComment('');
-      // onCommentSubmitted(data.comments[data.comments.length - 1]);
     },
   });
 
   const handleCommentSubmit = () => {
-    if (!comment) {
-      console.log('Comment is empty!');
-      return;
-    }
-    onCommentSubmitted(comment);
-    mutate({postId, comment});
+    !comment
+      ? ToastAndroid.show(
+          'Please enter a comment',
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        )
+      : comment.length > 100
+      ? ToastAndroid.show(
+          'Comment is too long',
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        )
+      : !storedCredentials.token
+      ? ToastAndroid.show(
+          'Please login to comment',
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        )
+      : (onCommentSubmitted(comment), mutate({postId, comment}));
   };
 
   return (
-    <View className="flex flex-row items-center justify-between bg-white">
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        width: '100%',
+        marginTop: 10,
+        backgroundColor: '#F0F0F0',
+        borderRadius: 20,
+      }}>
+      <Icon
+        name="account-circle"
+        size={40}
+        color="#20B08E"
+        style={{marginRight: 10, marginLeft: 10}}
+      />
       <TextInput
         placeholder="Add a comment..."
-        placeholderTextColor={'#20B08E'}
-        style={{flex: 1, marginLeft: 10, color: 'black'}}
+        placeholderTextColor={'#000'}
+        style={{color: 'black', marginRight: 100}}
         value={comment}
         onChangeText={text => setComment(text)}
       />
@@ -39,10 +68,14 @@ const CommentButton = ({postId, onCommentSubmitted}) => {
         name="send"
         size={24}
         color="#20B08E"
-        backgroundColor="#FFF"
         onPress={handleCommentSubmit}
-        style={{backgroundColor: '#FFF'}}>
-        <Text style={{color: '#20B08E', marginLeft: 5}}>Send</Text>
+        style={{backgroundColor: '#F0F0F0'}}>
+        <Text
+          style={{
+            color: '#20B08E',
+          }}>
+          Send
+        </Text>
       </Icon.Button>
     </View>
   );
