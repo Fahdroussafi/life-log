@@ -173,13 +173,27 @@ const CommentPost = asyncHandler(async (req, res) => {
 
   const post = await Post.findById(id);
 
-  post.comments.push(comment);
+  if (!post) {
+    return res.status(404).json({ message: "Post not found" });
+  }
+
+  if (!post.comments) {
+    post.comments = [];
+  }
+
+  const newComment = {
+    text: comment,
+    createdAt: new Date().toISOString(),
+    user: req.userId,
+  };
+
+  post.comments.push(newComment);
 
   const updatedPost = await Post.findByIdAndUpdate(id, post, {
     new: true,
-  });
+  }).populate("comments.user", "name");
 
-  res.json(updatedPost);
+  res.status(200).json({ updatedPost });
 });
 
 // @route GET api/posts/search
@@ -194,7 +208,9 @@ const getPostsBySearch = asyncHandler(async (req, res) => {
 
     const posts = await Post.find({
       $or: [{ title }, { tags: { $in: tags.split(",") } }],
-    }).populate("creator", "name");
+    })
+      .populate("creator", "name")
+      .populate("comments.user", "name");
 
     res.json({ data: posts });
   } catch (error) {
@@ -208,7 +224,9 @@ const getPostsBySearch = asyncHandler(async (req, res) => {
 const getPost = asyncHandler(async (req, res) => {
   const { id } = req.params;
   try {
-    const post = await Post.findById(id).populate("creator", "name");
+    const post = await Post.findById(id)
+      .populate("creator", "name")
+      .populate("comments.user", "name");
 
     res.status(200).json(post);
   } catch (error) {
