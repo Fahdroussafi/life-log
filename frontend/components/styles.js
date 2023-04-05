@@ -246,6 +246,26 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 10,
   },
+  postTags: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 10,
+    marginBottom: 10,
+    marginLeft: 10,
+    color: '#20B08E',
+  },
+  postTag: {
+    color: '#20B08E',
+    marginRight: 5,
+    marginBottom: 5,
+  },
+  postDescription: {
+    color: '#000',
+    fontSize: 14,
+    marginLeft: 10,
+    marginRight: 10,
+    marginBottom: 10,
+  },
 });
 
 export default styles;
