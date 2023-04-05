@@ -2,7 +2,7 @@ import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 import HomeScreen from '../screens/HomeScreen';
-import PostScreen from '../screens/PostScreen';
+import PostScreen from '../screens/PostScreen/PostScreen';
 import CustomHeader from '../components/CustomHeader';
 
 const HomeStack = createNativeStackNavigator();
