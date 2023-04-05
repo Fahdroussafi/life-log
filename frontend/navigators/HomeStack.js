@@ -3,6 +3,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 import HomeScreen from '../screens/HomeScreen';
 import PostScreen from '../screens/PostScreen';
+import CustomHeader from '../components/CustomHeader';
 
 const HomeStack = createNativeStackNavigator();
 
@@ -21,6 +22,14 @@ function App() {
         name="Post"
         component={PostScreen}
         options={{
+          header: ({scene, previous, navigation}) => (
+            <CustomHeader
+              scene={scene}
+              previous={previous}
+              navigation={navigation}
+            />
+          ),
+
           animation: 'slide_from_bottom',
         }}
       />
