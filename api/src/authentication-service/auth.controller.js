@@ -24,7 +24,7 @@ const Login = asyncHandler(async (req, res) => {
       { email: oldUser.email, id: oldUser._id },
       process.env.JWT_SECRET,
       {
-        expiresIn: "1h",
+        expiresIn: "30d",
       }
     );
 
