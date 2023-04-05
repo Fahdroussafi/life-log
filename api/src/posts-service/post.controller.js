@@ -99,10 +99,7 @@ const DeletePost = asyncHandler(async (req, res) => {
 
   const deletedPost = await Post.findByIdAndRemove(_id);
 
-  res.status(201).send({
-    deletedPost: deletedPost,
-    message: "Post deleted successfully",
-  });
+  res.status(201).send(deletedPost);
 });
 
 // @route PATCH api/posts/:id/likepost
@@ -234,6 +231,19 @@ const getPost = asyncHandler(async (req, res) => {
   }
 });
 
+// @route GET api/posts/creator/:id
+// @desc Get posts by creator
+// @access Private
+const getPostsByCreator = asyncHandler(async (req, res) => {
+  try {
+    const posts = await Post.find({ creator: req.userId });
+
+    res.status(200).json(posts);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+});
+
 module.exports = {
   CreatePost,
   getPost,
@@ -245,4 +255,5 @@ module.exports = {
   LikePost,
   CommentPost,
   getPostsBySearch,
+  getPostsByCreator,
 };
