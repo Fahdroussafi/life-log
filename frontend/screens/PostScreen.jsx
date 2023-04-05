@@ -6,6 +6,7 @@ import {
   FlatList,
   SafeAreaView,
   ActivityIndicator,
+  ScrollView,
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -64,7 +65,8 @@ const PostScreen = ({route}) => {
   }
 
   return (
-    <SafeAreaView style={styles.postScreenContainer}>
+    // <SafeAreaView>
+    <ScrollView style={styles.postScreenContainer}>
       {post && (
         <View style={styles.postContainer}>
           <View style={styles.postHeader}>
@@ -84,12 +86,24 @@ const PostScreen = ({route}) => {
               </Text>
             </View>
           </View>
+          <Text style={styles.postTitle}>{post.title}</Text>
+          <Text style={styles.postDescription}>{post.message}</Text>
           <Text style={styles.postDate}>
             {moment(post.createdAt).fromNow()}
           </Text>
+          <View style={styles.postTags}>
+            {post.tags.map(tag => (
+              <Text style={styles.postTag}>
+                # {''}
+                {tag}
+              </Text>
+            ))}
+          </View>
           <View style={styles.postCreatorContainer}>
-            <Text style={styles.postCreator}>{post.creator.name} </Text>
-            <Text style={styles.postCreator}>{post.title}</Text>
+            <Text style={styles.postCreator}>
+              Posted by: {''}
+              {post.creator.name}{' '}
+            </Text>
           </View>
           <View style={styles.postCommentContainer}>
             <CommentButton
@@ -107,7 +121,6 @@ const PostScreen = ({route}) => {
               }}
             />
           </View>
-          <Text style={styles.postDescription}>{post.message}</Text>
           {!storedCredentials.token && (
             <View style={styles.postCommentItemContainer}>
               <View style={styles.postCommentItem}>
@@ -140,7 +153,7 @@ const PostScreen = ({route}) => {
           )}
         </View>
       )}
-    </SafeAreaView>
+    </ScrollView>
   );
 };
 
