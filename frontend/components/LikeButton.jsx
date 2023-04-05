@@ -1,5 +1,5 @@
-import React, {useState, useEffect, useContext} from 'react';
-import {TouchableOpacity, View, Text} from 'react-native';
+import React, {useState, useEffect, useContext, useCallback} from 'react';
+import {TouchableOpacity, View, Text, ToastAndroid} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -11,56 +11,46 @@ const LikeButton = ({postId}) => {
   const navigation = useNavigation();
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
+  const {storedCredentials} = useContext(CredentialsContext);
 
-  const {storedCredentials, setStoredCredentials} =
-    useContext(CredentialsContext);
-
-  useEffect(() => {
-    // Check if the post is liked by the user
-    const checkLiked = async () => {
-      try {
-        const token = await AsyncStorage.getItem('token');
-        if (token) {
-          const res = await axios.get(
-            `${API_URL}/api/posts/${postId}/checkIfLiked`,
-            {
-              headers: {Authorization: `Bearer ${token}`},
-            },
-          );
-          setLiked(res.data.isLiked);
-        } else {
-          setLiked(false);
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    checkLiked();
-
-    // Get the total number of likes for the post
-    const getLikesCount = async () => {
-      try {
-        const res = await axios.get(
-          `${API_URL}/api/posts/${postId}/likesCount`,
-        );
-        setLikesCount(res.data.likesCount);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    getLikesCount();
-
-    // Reset state when credentials are cleared
-    if (!storedCredentials) {
-      setLiked(false);
-      setLikesCount(0);
-    }
-  }, [postId, storedCredentials]);
-
-  const handleLike = async () => {
+  const checkLiked = useCallback(async () => {
     try {
-      setLiked(!liked); // Optimistic UI update
-      setLikesCount(liked ? likesCount - 1 : likesCount + 1); // Optimistic UI update
+      const token = await AsyncStorage.getItem('token');
+      if (token) {
+        const res = await axios.get(
+          `${API_URL}/api/posts/${postId}/checkIfLiked`,
+          {headers: {Authorization: `Bearer ${token}`}},
+        );
+        setLiked(res.data.isLiked);
+      } else {
+        setLiked(false);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }, [postId]);
+
+  const getLikesCount = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API_URL}/api/posts/${postId}/likesCount`);
+      setLikesCount(res.data.likesCount);
+    } catch (err) {
+      console.log(err);
+    }
+  }, [postId]);
+
+  const handleLike = useCallback(async () => {
+    try {
+      if (!storedCredentials.token) {
+        ToastAndroid.show(
+          'You must be logged in to like a post',
+          ToastAndroid.SHORT,
+        );
+
+        return;
+      }
+      setLiked(!liked);
+      setLikesCount(liked ? likesCount - 1 : likesCount + 1);
       const token = await AsyncStorage.getItem('token');
       if (token) {
         const res = await axios.patch(
@@ -74,49 +64,34 @@ const LikeButton = ({postId}) => {
     } catch (err) {
       console.log(err);
     }
-  };
+  }, [postId, liked, likesCount]);
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      const checkLiked = async () => {
-        try {
-          const token = await AsyncStorage.getItem('token');
-          if (token) {
-            const res = await axios.get(
-              `${API_URL}/api/posts/${postId}/checkIfLiked`,
-              {
-                headers: {Authorization: `Bearer ${token}`},
-              },
-            );
-            setLiked(res.data.isLiked);
-          } else {
-            setLiked(false);
-          }
-        } catch (err) {
-          console.log(err);
-        }
-      };
-      checkLiked();
-    });
+    Promise.all([checkLiked(), getLikesCount()]);
+  }, [checkLiked, getLikesCount]);
 
+  useEffect(() => {
+    if (!storedCredentials) {
+      setLiked(false);
+      setLikesCount(0);
+    }
+  }, [storedCredentials]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', checkLiked);
     return unsubscribe;
-  }, [navigation]);
+  }, [navigation, checkLiked]);
 
   return (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingTop: 5,
-      }}>
+    <View style={{flexDirection: 'row', alignItems: 'center'}}>
       <TouchableOpacity onPress={handleLike}>
         <MaterialCommunityIcons
           name={liked ? 'favorite' : 'favorite-border'}
           size={24}
-          color={liked ? 'red' : 'white'}
+          color={liked ? 'red' : 'black'}
         />
       </TouchableOpacity>
-      <Text style={{marginLeft: 5, color: 'white'}}>{likesCount}</Text>
+      <Text style={{marginLeft: 5, color: 'black'}}>{likesCount}</Text>
     </View>
   );
 };
