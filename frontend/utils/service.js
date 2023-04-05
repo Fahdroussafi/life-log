@@ -55,3 +55,24 @@ export async function CommentOnPost({postId, comment}) {
   );
   return response.data;
 }
+
+export async function deletePost(postId) {
+  const token = await AsyncStorage.getItem('token');
+  const response = await axios.delete(`${API_URL}/api/posts/${postId}/delete`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+}
+
+export async function getPostsByCreator() {
+  const token = await AsyncStorage.getItem('token');
+
+  const response = await axios.get(`${API_URL}/api/posts/creator`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+}
