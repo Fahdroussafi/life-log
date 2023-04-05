@@ -1,5 +1,6 @@
 import axios from 'axios';
 import {API_URL} from '../env';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export async function login({email, password}) {
   const response = await axios.post(`${API_URL}/api/auth/login`, {
@@ -40,10 +41,16 @@ export async function getPost(postId) {
 }
 
 export async function CommentOnPost({postId, comment}) {
+  const token = await AsyncStorage.getItem('token');
   const response = await axios.post(
     `${API_URL}/api/posts/${postId}/commentPost`,
     {
       comment,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     },
   );
   return response.data;
