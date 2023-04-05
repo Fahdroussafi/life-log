@@ -7,8 +7,8 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import HomeScreen from '../screens/HomeScreen';
 import AuthScreen from '../screens/AuthScreen';
 
-import NewPost from '../screens/NewPostScreen';
-import PostsLiked from '../screens/PostsLiked';
+import NewPost from '../screens/NewPostScreen/NewPostScreen';
+import PostsLiked from '../screens/MyPosts';
 
 import {View, KeyboardAvoidingView, Platform} from 'react-native';
 
