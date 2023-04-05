@@ -20,17 +20,17 @@ const HomeScreen = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-[#242424] ">
+    <SafeAreaView className="flex-1 bg-[#fff] ">
       <View className="p-4">
         <View className="flex flex-row justify-between items-center py-2">
-          <Text className="text-white text-2xl tracking-widest font-[avenir] font-bold">
+          <Text className="text-black text-2xl tracking-widest font-[avenir] font-bold">
             Hi,{' '}
             {storedCredentials.userName ? (
               <Text className="text-[#20B08E] font-bold text-2xl font-[avenir]">
                 {storedCredentials.userName}
               </Text>
             ) : (
-              <Text className="text-white font-bold text-2xl font-[avenir]">
+              <Text className="text-black font-bold text-2xl font-[avenir]">
                 Guest
               </Text>
             )}
