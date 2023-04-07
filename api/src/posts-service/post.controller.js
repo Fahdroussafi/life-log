@@ -231,7 +231,6 @@ module.exports = {
   getLikeCount,
   checkIfLiked,
   GetPosts,
-  UpdatePost,
   DeletePost,
   LikePost,
   CommentPost,
